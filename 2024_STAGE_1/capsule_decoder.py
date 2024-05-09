@@ -23,14 +23,26 @@ class Encryption(BaseModel):
     message: str
     key: str
 
+alphabet=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+          'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+
+def shift_letter(letter, shift):
+    global alphabet
+    letter = letter.upper()
+    if letter in alphabet:
+        index = alphabet.index(letter)
+        return alphabet[(index + shift) % 26]
+    else:
+        return letter
+
 def combine_keys(user_key, my_key):
     combined_key = ""
     # Iterate over the length of the longer key
     for i in range(max(len(user_key), len(my_key))):
         if i < len(user_key):
-            combined_key += user_key[i]  # Add character from user key
+            combined_key += user_key[i].upper()  # Add character from user key
         if i < len(my_key):
-            combined_key += my_key[i]    # Add character from your key
+            combined_key += my_key[i].upper()    # Add character from your key
     return combined_key
 
 def vigenere_decrypt(message, key):
@@ -39,9 +51,8 @@ def vigenere_decrypt(message, key):
     key_index = 0
     for char in message:
         if char.isalpha():
-            ascii_offset = 65 if char.isupper() else 97
-            shift = ord(key[key_index % key_length].upper()) - 65
-            decrypted_char = chr((ord(char) - ascii_offset - shift) % 26 + ascii_offset)
+            shift = alphabet.index(key[key_index % key_length])
+            decrypted_char = shift_letter(char, -shift)
             decrypted_message += decrypted_char
             key_index += 1
         else:
@@ -55,9 +66,8 @@ def vigenere_encrypt(message, user_key):
     key_index = 0
     for char in message:
         if char.isalpha():
-            ascii_offset = 65 if char.isupper() else 97
-            shift = ord(key[key_index % key_length].upper()) - 65
-            encrypted_char = chr((ord(char) - ascii_offset + shift) % 26 + ascii_offset)
+            shift = alphabet.index(key[key_index % key_length])
+            encrypted_char = shift_letter(char, shift)
             encrypted_message += encrypted_char
             key_index += 1
         else:
