@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Request, status,APIRouter
+from fastapi import FastAPI, HTTPException, Request, status, APIRouter
 from dotenv import load_dotenv
 from pydantic import BaseModel
 import base64
@@ -47,20 +47,6 @@ def vigenere_decrypt(message, key):
         else:
             decrypted_message += char
     return decrypted_message
-
-
-def caesar_encrypt(message, user_key):
-    key = combine_keys(user_key,SECRET_KEY)
-    numeric_key = sum(ord(char) for char in key)
-    encrypted_message = ""
-    for char in message:
-        if char.isalpha():
-            ascii_offset = 65 if char.isupper() else 97
-            encrypted_char = chr((ord(char) - ascii_offset + numeric_key) % 26 + ascii_offset)
-            encrypted_message += encrypted_char
-        else:
-            encrypted_message += char
-    return encrypted_message
 
 def vigenere_encrypt(message, user_key):
     key = combine_keys(user_key,SECRET_KEY)
@@ -138,15 +124,6 @@ async def process_time_capsule(request: TimeCapsuleRequest):
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-
-@router.post("/caesar_encrypt")
-async def process_caesar_encription(request: Encryption):
-    try:
-        encrypted_message = caesar_encrypt(request.message,request.key)
-        return { "encrypted_message" : encrypted_message }
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
 
 @router.post("/vigenere_encrypt")
 async def process_vigenere_encription(request: Encryption):
